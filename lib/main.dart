@@ -16,6 +16,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
  @override
   Widget build(BuildContext context) {
  return MaterialApp.router(
@@ -26,7 +28,7 @@ class MyApp extends StatelessWidget {
   }}
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  const MyHomePage({super.key});
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -49,6 +51,11 @@ final GoRouter _router = GoRouter(
       path: '/login',
       builder: (BuildContext context, GoRouterState state) {
  return LoginScreen();
+      }),
+ GoRoute(
+      path: '/register',
+      builder: (BuildContext context, GoRouterState state) {
+ return RegistrationScreen();
       }),
     GoRoute(
       path: '/',

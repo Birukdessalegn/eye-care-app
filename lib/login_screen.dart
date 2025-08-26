@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -88,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Navigate to home screen on successful login
         context.go('/');
       } on FirebaseAuthException catch (e) {
-        String message = 'An error occurred. Please try again.';
+        String message = 'Login failed: ${e.code}';
         if (e.code == 'user-not-found') {
           message = 'No user found for that email.';
         } else if (e.code == 'wrong-password') {

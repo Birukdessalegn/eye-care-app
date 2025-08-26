@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AwarenessScreen extends StatelessWidget {
-  const AwarenessScreen({Key? key}) : super(key: key);
+  const AwarenessScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
