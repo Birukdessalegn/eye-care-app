@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 class AwarenessScreen extends StatelessWidget {
   const AwarenessScreen({super.key});
   @override

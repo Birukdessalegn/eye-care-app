@@ -1,6 +1,6 @@
 {
-    "name": "myapp",
-    "short_name": "myapp",
+    "name": "Ocu-Care",
+    "short_name": "Ocu-Care",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

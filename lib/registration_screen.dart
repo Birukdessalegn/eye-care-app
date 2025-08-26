@@ -42,7 +42,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Registration successful!')),
       );
-      context.go('/login');
+ context.go('/login');
     } on FirebaseAuthException catch (e) {
       String message = 'Registration failed: ${e.message}';
       ScaffoldMessenger.of(context).showSnackBar(

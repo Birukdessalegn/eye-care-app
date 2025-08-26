@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ocu_care/main.dart'; // Assuming main.dart is in ocu_care package
 
 class ExerciseScreen extends StatelessWidget {
   const ExerciseScreen({super.key});

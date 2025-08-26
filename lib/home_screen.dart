@@ -12,7 +12,7 @@ class HomeScreen extends StatelessWidget {
         title: Row(
           children: [
             // Placeholder for logo or icon from the image
-            const Icon(Icons.remove_red_eye_outlined), 
+            const Icon(Icons.remove_red_eye_outlined),
             const SizedBox(width: 8),
             const Text('Ocu-Care'), // Placeholder title from the image
           ],
