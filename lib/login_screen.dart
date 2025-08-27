@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
+// Import Firestore
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -86,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
  password: _passwordController.text,
  ); 
         // Navigate to home screen on successful login
-        context.go('/');
+ context.go('/');
       } on FirebaseAuthException catch (e) {
         String message = 'Login failed: ${e.code}';
         if (e.code == 'user-not-found') {
