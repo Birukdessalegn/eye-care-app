@@ -10,7 +10,6 @@ import 'package:ocu_care/login_screen.dart';
 import 'package:ocu_care/exercise_screen.dart';
 import 'package:ocu_care/reminder_settings_screen.dart';
 import 'package:ocu_care/awareness_screen.dart';
-import 'package:ocu_care/chat_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
