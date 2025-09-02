@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,7 +16,6 @@ import 'screens/exercise_screen.dart';
 import 'screens/awareness_screen.dart';
 import 'screens/reminder_settings_screen.dart';
 import 'screens/chat_screen.dart';
-import 'screens/admin_dashboard.dart';
 import 'screens/clinics_screen.dart';
 import 'utils/firebase_test.dart';
 
@@ -30,19 +30,26 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     print('Firebase initialized successfully');
+
+    // Activate App Check
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: AndroidProvider.debug,
+      // You can also set providers for other platforms, like Apple and web.
+    );
+    print('Firebase App Check activated with debug provider.');
     
     // Test Firebase connection
     await FirebaseTest.testConnection();
     
   } catch (e) {
-    print('Firebase initialization failed: $e');
+    print('Firebase initialization or App Check activation failed: $e');
   }
   
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +62,7 @@ class MyApp extends StatelessWidget {
         builder: (context, authService, child) {
           return MaterialApp.router(
             title: 'Eye Care',
+            debugShowCheckedModeBanner: false,
             theme: ThemeData(
               primarySwatch: Colors.blue,
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
@@ -87,12 +95,10 @@ class MyApp extends StatelessWidget {
             routerConfig: GoRouter(
               routes: _buildRoutes(),
               redirect: (context, state) {
-                final isLoggedIn = authService.currentUser != null;
+                final isLoggedIn = authService.isLoggedIn;
                 final isAuthPage = state.uri.toString() == '/login' || 
                                   state.uri.toString() == '/register' ||
                                   state.uri.toString() == '/reset-password';
-
-                print('Router redirect - isLoggedIn: $isLoggedIn, isAuthPage: $isAuthPage, location: ${state.uri.toString()}');
 
                 if (!isLoggedIn && !isAuthPage) {
                   return '/login';
@@ -149,10 +155,6 @@ class MyApp extends StatelessWidget {
           GoRoute(
             path: 'chat',
             builder: (context, state) => ChatScreen(userId: 'current_user_id'),
-          ),
-          GoRoute(
-            path: 'admin',
-            builder: (context, state) => const AdminDashboard(),
           ),
           GoRoute(
             path: 'clinics',

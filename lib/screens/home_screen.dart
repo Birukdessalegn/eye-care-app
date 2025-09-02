@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../services/auth_service.dart';
 
@@ -9,90 +10,64 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authService = Provider.of<AuthService>(context);
-    final user = authService.currentUser;
-    final isAdmin = user?.isAdmin ?? false;
+    final authService = Provider.of<AuthService>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Eye Care'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        title: const Text('Patient Dashboard'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-              context.go('/profile');
-            },
-          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await authService.signOut();
-              context.go('/login');
+              // GoRouter's refreshListenable will handle the navigation
             },
+            tooltip: 'Logout',
           ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Welcome, ${user?.name ?? "User"}!',
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        child: GridView.count(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          children: [
+            _buildDashboardCard(
+              context,
+              icon: Icons.visibility,
+              label: 'Exercises',
+              onTap: () => context.go('/exercises'),
             ),
-            const SizedBox(height: 10),
-            const Text(
-              'Take care of your eyes with our helpful features',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+            _buildDashboardCard(
+              context,
+              icon: Icons.lightbulb_outline,
+              label: 'Awareness',
+              onTap: () => context.go('/awareness'),
             ),
-            const SizedBox(height: 30),
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                children: [
-                  _buildFeatureCard(
-                    context,
-                    'Eye Exercises',
-                    Icons.fitness_center,
-                    Colors.blue,
-                    '/exercises',
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    'Reminders',
-                    Icons.notifications,
-                    Colors.green,
-                    '/reminders',
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    'Awareness',
-                    Icons.lightbulb_outline,
-                    Colors.orange,
-                    '/awareness',
-                  ),
-                  _buildFeatureCard(
-                    context,
-                    'Eye Clinics',
-                    Icons.local_hospital,
-                    Colors.red,
-                    '/clinics',
-                  ),
-                  if (isAdmin)
-                    _buildFeatureCard(
-                      context,
-                      'Admin Dashboard',
-                      Icons.admin_panel_settings,
-                      Colors.purple,
-                      '/admin',
-                    ),
-                ],
-              ),
+            _buildDashboardCard(
+              context,
+              icon: Icons.alarm,
+              label: 'Reminders',
+              onTap: () => context.go('/reminders'),
+            ),
+            _buildDashboardCard(
+              context,
+              icon: Icons.chat_bubble_outline,
+              label: 'Chat',
+              onTap: () => context.go('/chat'),
+            ),
+            _buildDashboardCard(
+              context,
+              icon: Icons.local_hospital,
+              label: 'Clinics',
+              onTap: () => context.go('/clinics'),
+            ),
+            _buildDashboardCard(
+              context,
+              icon: Icons.person_outline,
+              label: 'Profile',
+              onTap: () => context.go('/profile'),
             ),
           ],
         ),
@@ -100,36 +75,22 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureCard(
-    BuildContext context,
-    String title,
-    IconData icon,
-    Color color,
-    String route,
-  ) {
-    return Card(
-      elevation: 4,
-      child: InkWell(
-        onTap: () {
-          context.go(route);
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 40, color: color),
-              const SizedBox(height: 10),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
+  Widget _buildDashboardCard(BuildContext context, {required IconData icon, required String label, required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 48, color: Theme.of(context).primaryColor),
+            const SizedBox(height: 12),
+            Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          ],
         ),
       ),
     );

@@ -38,19 +38,21 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCQCwRJv7ZSgcQq4lCfJWSz-US7VzEmIaw',
-    appId: '1:710458702306:web:6202085d6e0a21671ba1bb',
-    messagingSenderId: '710458702306',
-    projectId: 'my-eye-healt',
-    authDomain: 'my-eye-healt.firebaseapp.com',
-    storageBucket: 'my-eye-healt.firebasestorage.app',
+    apiKey: 'AIzaSyAftEPfILGJTE4VY42RXzNUa8Rd2sxaITA',
+    appId: '1:956939898418:web:b3333753b237cadd8f762b',
+    messagingSenderId: '956939898418',
+    projectId: 'ocu-care-app',
+    authDomain: 'ocu-care-app.firebaseapp.com',
+    storageBucket: 'ocu-care-app.firebasestorage.app',
+    measurementId: 'G-3XN1LTZM61',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAl9-EpuApWDstp2IGvcrAN0DVjVvWl6Is',
-    appId: '1:710458702306:android:e610878039b4e7da1ba1bb',
-    messagingSenderId: '710458702306',
-    projectId: 'my-eye-healt',
-    storageBucket: 'my-eye-healt.firebasestorage.app',
+    apiKey: 'AIzaSyCN0mKNFbeheXgi1nAFYZf2YoFXpyMzmOE',
+    appId: '1:956939898418:android:e0a2bdf92f86daf98f762b',
+    messagingSenderId: '956939898418',
+    projectId: 'ocu-care-app',
+    storageBucket: 'ocu-care-app.firebasestorage.app',
   );
+
 }

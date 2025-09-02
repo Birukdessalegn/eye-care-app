@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "710458702306",
-    "project_id": "my-eye-healt",
-    "storage_bucket": "my-eye-healt.firebasestorage.app"
+    "project_number": "956939898418",
+    "project_id": "ocu-care-app",
+    "storage_bucket": "ocu-care-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:710458702306:android:e610878039b4e7da1ba1bb",
+        "mobilesdk_app_id": "1:956939898418:android:783798e01f3e66638f762b",
         "android_client_info": {
           "package_name": "com.example.myapp"
         }
@@ -15,7 +15,26 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAl9-EpuApWDstp2IGvcrAN0DVjVvWl6Is"
+          "current_key": "AIzaSyCN0mKNFbeheXgi1nAFYZf2YoFXpyMzmOE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:956939898418:android:e0a2bdf92f86daf98f762b",
+        "android_client_info": {
+          "package_name": "com.ocucare.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCN0mKNFbeheXgi1nAFYZf2YoFXpyMzmOE"
         }
       ],
       "services": {

@@ -21,14 +21,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   @override
-  void initState() {
-    super.initState();
-    // Pre-fill with test values for easier testing
-    _emailController.text = 'test@example.com';
-    _passwordController.text = 'password123';
-  }
-
-  @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
 
@@ -38,17 +30,17 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFE3F2FD), Color(0xFFBBDEFB)],
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFFE3F2FD), Color(0xFFBBDEFB)],
+            ),
           ),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
+          child: Center(
             child: Card(
               elevation: 8,
               shape: RoundedRectangleBorder(
@@ -103,9 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           : CustomButton(
                               text: 'Login',
                               onPressed: () async {
-                                print('Login button pressed');
                                 if (_formKey.currentState!.validate()) {
-                                  print('Form is valid');
                                   setState(() {
                                     _isLoading = true;
                                   });
@@ -115,37 +105,33 @@ class _LoginScreenState extends State<LoginScreen> {
                                     _passwordController.text.trim(),
                                   );
                                   
-                                  setState(() {
-                                    _isLoading = false;
-                                  });
-                                  
-                                  print('Login result: $success');
-                                  if (success) {
-                                    print('Login successful, navigating to home');
-                                    // Navigation is handled by the router based on auth state
-                                  } else {
-                                    print('Login failed: ${authService.errorMessage}');
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          authService.errorMessage.isNotEmpty 
-                                              ? authService.errorMessage 
-                                              : 'Login failed. Please try again.',
+                                  if (mounted) {
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+
+                                    if (success) {
+                                      // The GoRouter redirect will handle navigation
+                                    } else {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            authService.errorMessage.isNotEmpty 
+                                                ? authService.errorMessage 
+                                                : 'Login failed. Please try again.',
+                                          ),
+                                          backgroundColor: Colors.red,
+                                          duration: const Duration(seconds: 3),
                                         ),
-                                        backgroundColor: Colors.red,
-                                        duration: const Duration(seconds: 3),
-                                      ),
-                                    );
+                                      );
+                                    }
                                   }
-                                } else {
-                                  print('Form validation failed');
                                 }
                               },
                             ),
                       const SizedBox(height: 16.0),
                       TextButton(
                         onPressed: () {
-                          print('Navigate to register');
                           context.go('/register');
                         },
                         child: const Text('Don\'t have an account? Register'),
@@ -156,13 +142,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           context.go('/reset-password');
                         },
                         child: const Text('Forgot Password?'),
-                      ),
-                      const SizedBox(height: 16.0),
-                      // Debug info
-                      const Text(
-                        'Test credentials: test@example.com / password123',
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
-                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
