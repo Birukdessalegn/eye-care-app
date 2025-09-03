@@ -1,25 +1,59 @@
+
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+// Placeholder model for a clinic
+class Clinic {
+  final String name;
+  final String address;
+  final String phone;
+  final double latitude;
+  final double longitude;
+
+  // Adding the 'const' keyword to the constructor
+  const Clinic({
+    required this.name,
+    required this.address,
+    required this.phone,
+    required this.latitude,
+    required this.longitude,
+  });
+}
 
 class ClinicsScreen extends StatelessWidget {
   const ClinicsScreen({super.key});
 
-  Future<void> _launchMaps(String address) async {
-    final url = 'https://www.google.com/maps/search/?api=1&query=$address';
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url));
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
+  // This list requires the Clinic constructor to be const
+  final List<Clinic> _clinics = const [
+    Clinic(
+      name: 'Global Eye & Vision Center',
+      address: '123 Vision St, Optic City, 12345',
+      phone: '555-123-4567',
+      latitude: 34.0522,
+      longitude: -118.2437,
+    ),
+    Clinic(
+      name: 'Lens & Frame Specialists',
+      address: '456 Focus Ave, Iris Town, 67890',
+      phone: '555-987-6543',
+      latitude: 40.7128,
+      longitude: -74.0060,
+    ),
+    Clinic(
+      name: 'Retina Health Institute',
+      address: '789 Pupil Blvd, Cornea County, 54321',
+      phone: '555-555-5555',
+      latitude: 41.8781,
+      longitude: -87.6298,
+    ),
+  ];
 
-  Future<void> _makePhoneCall(String phoneNumber) async {
-    final url = 'tel:$phoneNumber';
+  Future<void> _launchMaps(double lat, double lon) async {
+    final url = 'https://www.google.com/maps/search/?api=1&query=$lat,$lon';
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
     } else {
-      throw 'Could not launch $url';
+      print('Could not launch maps');
     }
   }
 
@@ -27,89 +61,27 @@ class ClinicsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Eye Clinics'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        title: const Text('Nearby Clinics'),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('clinics').snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          
-          final clinics = snapshot.data!.docs;
-          
-          if (clinics.isEmpty) {
-            return const Center(
-              child: Text(
-                'No clinics available. Please check back later.',
-                style: TextStyle(fontSize: 18),
+      body: ListView.builder(
+        itemCount: _clinics.length,
+        itemBuilder: (context, index) {
+          final clinic = _clinics[index];
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            elevation: 2,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            child: ListTile(
+              leading: const Icon(Icons.local_hospital, color: Colors.blue, size: 40),
+              title: Text(clinic.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text(clinic.address),
+              trailing: IconButton(
+                icon: const Icon(Icons.map_outlined, color: Colors.blue),
+                tooltip: 'Show on map',
+                onPressed: () => _launchMaps(clinic.latitude, clinic.longitude),
               ),
-            );
-          }
-          
-          return ListView.builder(
-            itemCount: clinics.length,
-            itemBuilder: (context, index) {
-              final clinic = clinics[index].data() as Map<String, dynamic>;
-              return Card(
-                margin: const EdgeInsets.all(8.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        clinic['name'],
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        clinic['address'],
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.phone, color: Colors.blue),
-                            onPressed: () => _makePhoneCall(clinic['phone']),
-                          ),
-                          Text(clinic['phone']),
-                          const Spacer(),
-                          IconButton(
-                            icon: const Icon(Icons.map, color: Colors.blue),
-                            onPressed: () => _launchMaps(clinic['address']),
-                          ),
-                        ],
-                      ),
-                      if (clinic['hours'] != null) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          'Hours: ${clinic['hours']}',
-                          style: const TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
-                      if (clinic['services'] != null) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          'Services: ${clinic['services']}',
-                          style: const TextStyle(fontSize: 14, color: Colors.grey),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              );
-            },
+              onTap: () => _launchMaps(clinic.latitude, clinic.longitude),
+            ),
           );
         },
       ),

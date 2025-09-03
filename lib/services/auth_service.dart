@@ -1,172 +1,140 @@
-import 'package:flutter/foundation.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
+import 'api_service.dart';
 
 class AuthService with ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final ApiService _apiService = ApiService();
 
   UserModel? _currentUser;
   String _errorMessage = '';
-
+  bool _isInitialized = false; // To prevent redirects before startup check is complete
+  
+  // Public Getters
   UserModel? get currentUser => _currentUser;
   String get errorMessage => _errorMessage;
   bool get isLoggedIn => _currentUser != null;
+  bool get isInitialized => _isInitialized;
 
   AuthService() {
-    _auth.authStateChanges().listen(_onAuthStateChanged);
+    _initialize();
   }
 
-  Future<void> _onAuthStateChanged(User? firebaseUser) async {
-    if (firebaseUser == null) {
-      _currentUser = null;
-    } else {
-      await _fetchUser(firebaseUser.uid);
+  /// Checks for a saved token on app startup and fetches user data.
+  Future<void> _initialize() async {
+    final token = await _apiService.getToken();
+    if (token != null) {
+      try {
+        // If a token exists, validate it by fetching the user profile
+        await _fetchAndSetUser();
+      } catch (e) {
+        // If fetching fails (e.g., invalid token), log out
+        print('Initialization failed: $e');
+        await logout();
+      }
     }
+    _isInitialized = true;
     notifyListeners();
   }
 
-  Future<void> _fetchUser(String userId) async {
+  /// Step 1 of Registration: Request registration and OTP.
+  Future<bool> requestRegistration({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String password,
+  }) async {
     try {
-      DocumentSnapshot userDoc =
-          await _firestore.collection('users').doc(userId).get();
-      if (userDoc.exists) {
-        _currentUser = UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
-      }
-    } catch (e) {
-      print('Error fetching user: $e');
-      _currentUser = null;
-    }
-  }
-
-  Future<bool> register(String name, String email, String password, {String role = 'user'}) async {
-    try {
-      UserCredential result = await _auth.createUserWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
-      );
-
-      UserModel newUser = UserModel(
-        id: result.user!.uid,
-        name: name,
+      final response = await _apiService.register(
+        firstName: firstName,
+        lastName: lastName,
         email: email,
-        role: role,
+        password: password,
       );
-
-      await _firestore.collection('users').doc(result.user!.uid).set(newUser.toMap());
-      
-      _errorMessage = '';
-      return true;
-    } on FirebaseAuthException catch (e) {
-      _errorMessage = _getErrorMessage(e);
-      notifyListeners();
-      return false;
-    } catch (e) {
-      _errorMessage = 'An unexpected error occurred. Please try again.';
-      notifyListeners();
-      return false;
-    }
-  }
-
-  Future<bool> signIn(String email, String password) async {
-    try {
-      await _auth.signInWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
-      );
-      
-      _errorMessage = '';
-      return true;
-    } on FirebaseAuthException catch (e) {
-      _errorMessage = _getErrorMessage(e);
-      notifyListeners();
-      return false;
-    } catch (e) {
-      _errorMessage = 'An unexpected error occurred. Please try again.';
-      notifyListeners();
-      return false;
-    }
-  }
-
-  Future<bool> resetPassword(String email) async {
-    try {
-      await _auth.sendPasswordResetEmail(email: email.trim());
-      _errorMessage = '';
-      return true;
-    } on FirebaseAuthException catch (e) {
-      _errorMessage = _getErrorMessage(e);
-      notifyListeners();
-      return false;
-    } catch (e) {
-      _errorMessage = 'An unexpected error occurred. Please try again.';
-      notifyListeners();
-      return false;
-    }
-  }
-  
-  Future<bool> updateUserProfile(String name) async {
-    if (_currentUser == null) return false;
-
-    try {
-      await _firestore.collection('users').doc(_currentUser!.id).update({'name': name});
-      // Re-fetch user data to update the UI
-      await _fetchUser(_currentUser!.id);
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _errorMessage = 'Failed to update profile.';
-      notifyListeners();
-      return false;
-    }
-  }
-
-  Future<bool> deleteAccount() async {
-    if (_currentUser == null) return false;
-
-    try {
-      // First, delete the user's document from Firestore
-      await _firestore.collection('users').doc(_currentUser!.id).delete();
-      
-      // Then, delete the user from Firebase Authentication
-      await _auth.currentUser!.delete();
-      
-      return true;
-    } on FirebaseAuthException catch (e) {
-      // Handle re-authentication if necessary
-      if (e.code == 'requires-recent-login') {
-        _errorMessage = 'Please log out and log back in again to delete your account.';
-      } else {
-        _errorMessage = _getErrorMessage(e);
+      // According to your API, success is determined by the 'success' flag
+      if (response['success'] == true) {
+        _errorMessage = '';
+        notifyListeners();
+        return true; // Indicates navigation to OTP screen is safe
       }
+       _errorMessage = response['message'] ?? 'Registration request failed.';
       notifyListeners();
       return false;
     } catch (e) {
-      _errorMessage = 'Failed to delete account.';
+      _errorMessage = e.toString();
       notifyListeners();
       return false;
     }
   }
 
-  Future<void> signOut() async {
-    await _auth.signOut();
+  /// Step 2 of Registration: Verify OTP and log in.
+  Future<bool> verifyEmailAndLogin({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      final response = await _apiService.verifyEmail(email: email, otp: otp);
+      if (response['success'] == true && response['jwt'] != null) {
+        // OTP is correct, token is received. Now fetch user data.
+        await _fetchAndSetUser();
+        return true;
+      }
+      _errorMessage = response['message'] ?? 'OTP verification failed.';
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
+    }
   }
 
-  String _getErrorMessage(FirebaseAuthException e) {
-    switch (e.code) {
-      case 'user-not-found':
-        return 'No user found for that email.';
-      case 'wrong-password':
-        return 'Wrong password provided for that user.';
-      case 'email-already-in-use':
-        return 'The account already exists for that email.';
-      case 'invalid-credential':
-        return 'Invalid credentials, please check your email and password.';
-      case 'requires-recent-login':
-        return 'This operation is sensitive and requires recent authentication. Please log in again before retrying.';
-      default:
-        return 'An error occurred. Please try again.';
+  /// Log in with email and password.
+  Future<bool> login(String email, String password) async {
+    try {
+      final response = await _apiService.login(email: email, password: password);
+      if (response['success'] == true && response['jwt'] != null) {
+        // Login is successful, token is received. Now fetch user data.
+        await _fetchAndSetUser();
+        return true;
+      }
+      _errorMessage = response['message'] ?? 'Login failed.';
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
     }
+  }
+
+  /// Fetches the latest user data from the server and updates the state.
+  Future<void> refreshUser() async {
+    await _fetchAndSetUser();
+  }
+
+  /// Fetches user data from the API and sets the local state.
+  Future<void> _fetchAndSetUser() async {
+    try {
+      final user = await _apiService.getUser();
+      _currentUser = user;
+      _errorMessage = '';
+    } catch (e) {
+      // This might happen if the token is expired/invalid
+      _errorMessage = 'Session expired. Please log in again.';
+      _currentUser = null;
+      // Rethrow to allow callers to handle it (like in _initialize)
+      rethrow; 
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  /// Logs the user out.
+  Future<void> logout() async {
+    await _apiService.logout();
+    _currentUser = null;
+    _errorMessage = '';
+    notifyListeners();
   }
 }

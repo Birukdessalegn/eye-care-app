@@ -30,9 +30,13 @@ class SimpleAuthService with ChangeNotifier {
     }
     
     // Simulate successful registration
+    final nameParts = name.split(' ');
+    final firstName = nameParts.isNotEmpty ? nameParts.first : '';
+    final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
     _currentUser = UserModel(
       id: 'simple-user-${DateTime.now().millisecondsSinceEpoch}',
-      name: name,
+      firstName: firstName,
+      lastName: lastName,
       email: email,
     );
     
@@ -63,9 +67,14 @@ class SimpleAuthService with ChangeNotifier {
     }
     
     // Simulate successful login
+    const name = 'Test User';
+    final nameParts = name.split(' ');
+    final firstName = nameParts.isNotEmpty ? nameParts.first : '';
+    final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
     _currentUser = UserModel(
       id: 'simple-user-12345',
-      name: 'Test User',
+      firstName: firstName,
+      lastName: lastName,
       email: email,
     );
     
@@ -76,9 +85,13 @@ class SimpleAuthService with ChangeNotifier {
 
   Future<bool> updateUserProfile(String name) async {
     if (_currentUser != null) {
+      final nameParts = name.split(' ');
+      final firstName = nameParts.isNotEmpty ? nameParts.first : '';
+      final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
       _currentUser = UserModel(
         id: _currentUser!.id,
-        name: name,
+        firstName: firstName,
+        lastName: lastName,
         email: _currentUser!.email,
       );
       notifyListeners();

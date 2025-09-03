@@ -1,33 +1,48 @@
+
+import 'dart:convert';
+
 class UserModel {
   final String id;
-  final String name;
+  final String firstName;
+  final String lastName;
   final String email;
-  final String role; // 'user' or 'admin'
+  final String? gender;
+  final String? dateOfBirth;
 
   UserModel({
     required this.id,
-    required this.name,
+    required this.firstName,
+    required this.lastName,
     required this.email,
-    this.role = 'user',
+    this.gender,
+    this.dateOfBirth,
   });
+
+  String get fullName => '$firstName $lastName';
+
+  factory UserModel.fromMap(Map<String, dynamic> map) {
+    return UserModel(
+      id: map['id']?.toString() ?? '',
+      firstName: map['first_name'] ?? '',
+      lastName: map['last_name'] ?? '',
+      email: map['email'] ?? '',
+      gender: map['gender'], // Corrected syntax
+      dateOfBirth: map['date_of_birth'], // Corrected syntax
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'name': name,
+      'first_name': firstName,
+      'last_name': lastName,
       'email': email,
-      'role': role,
+      'gender': gender,
+      'date_of_birth': dateOfBirth,
     };
   }
 
-  static UserModel fromMap(Map<String, dynamic> map) {
-    return UserModel(
-      id: map['id'],
-      name: map['name'],
-      email: map['email'],
-      role: map['role'] ?? 'user',
-    );
-  }
+  factory UserModel.fromJson(String source) => UserModel.fromMap(json.decode(source));
 
-  bool get isAdmin => role == 'admin';
+  String toJson() => json.encode(toMap());
 }

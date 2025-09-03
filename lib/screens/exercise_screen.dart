@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 import '../models/exercise_model.dart';
 import '../widgets/exercise_card.dart';
-
 class ExerciseScreen extends StatefulWidget {
   const ExerciseScreen({super.key});
 
