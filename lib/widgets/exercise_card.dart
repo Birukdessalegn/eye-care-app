@@ -5,7 +5,7 @@ import '../models/exercise_model.dart';
 class ExerciseCard extends StatelessWidget {
   final Exercise exercise;
 
-  const ExerciseCard({Key? key, required this.exercise}) : super(key: key);
+  const ExerciseCard({super.key, required this.exercise});
 
   @override
   Widget build(BuildContext context) {

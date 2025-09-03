@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../services/reminder_service.dart';
 
 class ReminderSettingsScreen extends StatefulWidget {
-  const ReminderSettingsScreen({Key? key}) : super(key: key);
+  const ReminderSettingsScreen({super.key});
 
   @override
   _ReminderSettingsScreenState createState() => _ReminderSettingsScreenState();

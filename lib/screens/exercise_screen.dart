@@ -5,7 +5,7 @@ import '../models/exercise_model.dart';
 import '../widgets/exercise_card.dart';
 
 class ExerciseScreen extends StatefulWidget {
-  const ExerciseScreen({Key? key}) : super(key: key);
+  const ExerciseScreen({super.key});
 
   @override
   _ExerciseScreenState createState() => _ExerciseScreenState();
