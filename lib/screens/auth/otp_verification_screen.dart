@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -35,16 +34,16 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     );
 
     if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+      setState(() {
+        _isLoading = false;
+      });
 
       if (success) {
         // On success, the router's redirect logic will automatically navigate to home
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(authService.errorMessage)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(authService.errorMessage)));
       }
     }
   }
@@ -77,7 +76,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       return 'Please enter the OTP.';
                     }
                     if (value.length != 6) {
-                       return 'OTP must be 6 digits.';
+                      return 'OTP must be 6 digits.';
                     }
                     return null;
                   },
@@ -91,9 +90,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       ),
                 const SizedBox(height: 20),
                 TextButton(
-                    onPressed: () => context.go('/register'),
-                    child: const Text('Go back to registration'),
-                )
+                  onPressed: () => context.go('/register'),
+                  child: const Text('Go back to registration'),
+                ),
               ],
             ),
           ),

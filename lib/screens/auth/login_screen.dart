@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -22,9 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     setState(() {
       _isLoading = true;
@@ -37,31 +34,33 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (mounted) {
-        setState(() {
-            _isLoading = false;
-        });
+      setState(() {
+        _isLoading = false;
+      });
 
-        if (success) {
-            // The GoRouter redirect will handle navigation automatically
-        } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                    content: Text(authService.errorMessage.isNotEmpty 
-                        ? authService.errorMessage 
-                        : 'Login failed. Please check your credentials.'),
-                    backgroundColor: Colors.red,
-                ),
-            );
-        }
+      if (success) {
+        // Navigate to OTP screen and pass the email
+        final email = _emailController.text.trim();
+        context.go('/otp', extra: email);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              authService.errorMessage.isNotEmpty
+                  ? authService.errorMessage
+                  : 'Login failed. Please check your credentials.',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Welcome Back'),
-      ),
+      appBar: AppBar(title: const Text('Welcome Back')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -70,11 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                const Icon(
-                  Icons.remove_red_eye,
-                  size: 60,
-                  color: Colors.blue,
-                ),
+                const Icon(Icons.remove_red_eye, size: 60, color: Colors.blue),
                 const SizedBox(height: 16),
                 const Text(
                   'Eye Care',
@@ -88,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Sign in to continue',
-                   textAlign: TextAlign.center,
+                  textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 30),
@@ -108,17 +103,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 30.0),
                 _isLoading
                     ? const Center(child: CircularProgressIndicator())
-                    : CustomButton(
-                        text: 'Login',
-                        onPressed: _submit,
-                      ),
+                    : CustomButton(text: 'Login', onPressed: _submit),
                 const SizedBox(height: 16.0),
-                 TextButton(
-                        onPressed: () {
-                          context.go('/reset-password');
-                        },
-                        child: const Text('Forgot Password?'),
-                      ),
+                TextButton(
+                  onPressed: () {
+                    context.go('/reset-password');
+                  },
+                  child: const Text('Forgot Password?'),
+                ),
                 const SizedBox(height: 8.0),
                 TextButton(
                   onPressed: () => context.go('/register'),
