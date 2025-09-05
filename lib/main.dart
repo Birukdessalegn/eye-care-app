@@ -67,9 +67,13 @@ class _MyAppState extends State<MyApp> {
           builder: (context, state) => const PasswordResetScreen(),
         ),
         GoRoute(
-          path: '/otp',
-          builder: (context, state) => const OtpVerificationScreen(),
-        ),
+  path: '/otp',
+  builder: (context, state) {
+    final email = state.extra as String; 
+    return OtpVerificationScreen(email: email);
+  },
+),
+
         GoRoute(
           path: '/exercises',
           builder: (context, state) => const ExerciseScreen(),
@@ -83,9 +87,13 @@ class _MyAppState extends State<MyApp> {
           builder: (context, state) => const ReminderSettingsScreen(),
         ),
         GoRoute(
-          path: '/chat',
-          builder: (context, state) => const ChatScreen(),
-        ),
+  path: '/chat',
+  builder: (context, state) {
+    final userId = state.extra as String;
+    return ChatScreen(userId: userId);
+  },
+),
+
         GoRoute(
           path: '/clinics',
           builder: (context, state) => const ClinicsScreen(),
