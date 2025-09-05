@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -25,9 +24,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _isLoading = false;
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     setState(() {
       _isLoading = true;
@@ -44,32 +41,32 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
 
     if (mounted) {
-        setState(() {
-            _isLoading = false;
-        });
+      setState(() {
+        _isLoading = false;
+      });
 
-        if (success) {
-            // Navigate to OTP screen upon successful registration request
-            context.go('/verify-otp/$email');
-        } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                    content: Text(authService.errorMessage.isNotEmpty 
-                        ? authService.errorMessage 
-                        : 'An unknown error occurred'),
-                    backgroundColor: Colors.red,
-                ),
-            );
-        }
+      if (success) {
+        // Navigate to OTP screen and pass the email via `extra`
+        context.go('/otp', extra: email);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              authService.errorMessage.isNotEmpty
+                  ? authService.errorMessage
+                  : 'An unknown error occurred',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create an Account'),
-      ),
+      appBar: AppBar(title: const Text('Create an Account')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -101,7 +98,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   controller: _lastNameController,
                   labelText: 'Last Name',
                   validator: Validators.nameValidator,
-                   textCapitalization: TextCapitalization.words,
+                  textCapitalization: TextCapitalization.words,
                 ),
                 const SizedBox(height: 16.0),
                 CustomTextField(
@@ -132,10 +129,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 const SizedBox(height: 30.0),
                 _isLoading
                     ? const Center(child: CircularProgressIndicator())
-                    : CustomButton(
-                        text: 'Request OTP',
-                        onPressed: _submit,
-                      ),
+                    : CustomButton(text: 'Request OTP', onPressed: _submit),
                 const SizedBox(height: 20.0),
                 TextButton(
                   onPressed: () => context.go('/login'),
