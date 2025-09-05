@@ -7,7 +7,7 @@ import '../models/user_model.dart';
 class ApiService {
   // --- IMPORTANT ---
   // Replace this with your actual Laravel API URL when it is deployed.
-  final String _baseUrl = 'http://10.88.198.200:8000/api/';
+  final String _baseUrl = 'http://www.eyecare-api.infinityfree.me/api/doc';
   // -----------------
 
   // --- Core API Methods ---
