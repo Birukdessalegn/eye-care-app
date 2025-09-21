@@ -111,6 +111,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
             tooltip: _isEditing ? 'Save Changes' : 'Edit Profile',
           ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+            onPressed: () async {
+              // Call logout to update auth state
+              await Provider.of<AuthService>(context, listen: false).logout();
+              context.go('/login');
+            },
+          ),
         ],
       ),
       body: Consumer<AuthService>(
@@ -138,8 +147,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           radius: 48,
                           backgroundColor: Colors.indigo.shade100,
                           child: Text(
-                            (user.firstName ?? '').isNotEmpty
-                                ? user.firstName![0].toUpperCase()
+                            user.firstName.isNotEmpty
+                                ? user.firstName[0].toUpperCase()
                                 : '',
                             style: const TextStyle(
                               fontSize: 40,
@@ -150,7 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         const SizedBox(height: 18),
                         Text(
-                          '${user.firstName ?? ''} ${user.lastName ?? ''}',
+                          '${user.firstName} ${user.lastName}',
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -159,7 +168,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          user.email ?? '',
+                          user.email,
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.grey,
