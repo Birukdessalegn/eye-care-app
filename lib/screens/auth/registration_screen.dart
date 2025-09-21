@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 import '../../services/api_service.dart';
-import '../../services/auth_service.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../utils/validators.dart';
@@ -19,24 +17,20 @@ class RegistrationScreen extends StatefulWidget {
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
+  bool _showPassword = false;
+  bool _showConfirmPassword = false;
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() {
       _isLoading = true;
     });
-
     try {
       final result = await apiService.register(
-        firstName: _firstNameController.text.trim(),
-        lastName: _lastNameController.text.trim(),
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
@@ -44,9 +38,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         _isLoading = false;
       });
       if (result['success'] == true) {
-        print(
-          'Navigating to OTP screen with email: ${_emailController.text.trim()}',
-        );
         context.go('/otp', extra: _emailController.text.trim());
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -130,37 +121,53 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         CustomTextField(
-                          controller: _firstNameController,
-                          labelText: 'First Name',
-                          validator: Validators.nameValidator,
-                          textCapitalization: TextCapitalization.words,
-                        ),
-                        const SizedBox(height: 16),
-                        CustomTextField(
-                          controller: _lastNameController,
-                          labelText: 'Last Name',
-                          validator: Validators.nameValidator,
-                          textCapitalization: TextCapitalization.words,
-                        ),
-                        const SizedBox(height: 16),
-                        CustomTextField(
                           controller: _emailController,
                           labelText: 'Email',
                           keyboardType: TextInputType.emailAddress,
                           validator: Validators.emailValidator,
                         ),
                         const SizedBox(height: 16),
-                        CustomTextField(
+                        TextFormField(
                           controller: _passwordController,
-                          labelText: 'Password',
-                          obscureText: true,
+                          obscureText: !_showPassword,
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            border: const OutlineInputBorder(),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _showPassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _showPassword = !_showPassword;
+                                });
+                              },
+                            ),
+                          ),
                           validator: Validators.passwordValidator,
                         ),
                         const SizedBox(height: 16),
-                        CustomTextField(
+                        TextFormField(
                           controller: _confirmPasswordController,
-                          labelText: 'Confirm Password',
-                          obscureText: true,
+                          obscureText: !_showConfirmPassword,
+                          decoration: InputDecoration(
+                            labelText: 'Confirm Password',
+                            border: const OutlineInputBorder(),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _showConfirmPassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _showConfirmPassword = !_showConfirmPassword;
+                                });
+                              },
+                            ),
+                          ),
                           validator: (value) {
                             if (value != _passwordController.text) {
                               return 'Passwords do not match';
@@ -207,8 +214,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   @override
   void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();

@@ -1,11 +1,12 @@
 import 'package:go_router/go_router.dart';
 
 import '../screens/auth/login_screen.dart';
-import '../screens/auth/registration_screen.dart';
+import '../screens/auth/registration_screen.dart' as auth;
 import '../screens/auth/password_reset_screen.dart';
 import '../screens/auth/otp_verification_screen.dart';
 import '../screens/home_screen.dart';
-import '../screens/profile_screen.dart';
+// import '../screens/profile_screen.dart';
+import '../screens/profile_screen.dart' as profile;
 import '../screens/exercise_screen.dart';
 import '../screens/awareness_screen.dart';
 import '../screens/reminder_settings_screen.dart';
@@ -20,7 +21,7 @@ class AppRoutes {
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/register',
-        builder: (context, state) => const RegistrationScreen(),
+        builder: (context, state) => const auth.RegistrationScreen(),
       ),
       GoRoute(
         path: '/reset-password',
@@ -41,10 +42,7 @@ class AppRoutes {
         path: '/',
         builder: (context, state) => const HomeScreen(),
         routes: [
-          GoRoute(
-            path: 'profile',
-            builder: (context, state) => const ProfileScreen(),
-          ),
+          
           GoRoute(
             path: 'exercises',
             builder: (context, state) => const ExerciseScreen(),

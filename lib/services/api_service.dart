@@ -10,14 +10,10 @@ class ApiService {
   // --- Auth & Account ---
 
   Future<Map<String, dynamic>> register({
-    required String firstName,
-    required String lastName,
     required String email,
     required String password,
   }) async {
     return _post('/accounts/register', {
-      'first_name': firstName,
-      'last_name': lastName,
       'email': email,
       'password': password,
       'password_confirmation': password,
@@ -148,7 +144,7 @@ class ApiService {
     required String gender,
     required String dateOfBirth,
   }) async {
-    return _patch('/user', {
+    return _patch('/users', {
       'first_name': firstName,
       'last_name': lastName,
       'gender': gender,

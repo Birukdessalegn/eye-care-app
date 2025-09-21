@@ -45,8 +45,7 @@ class AuthService with ChangeNotifier {
   }) async {
     try {
       final response = await _apiService.register(
-        firstName: firstName,
-        lastName: lastName,
+        
         email: email,
         password: password,
       );

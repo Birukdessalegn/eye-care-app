@@ -21,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _showPassword = false;
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
@@ -122,10 +123,25 @@ class _LoginScreenState extends State<LoginScreen> {
                           validator: Validators.emailValidator,
                         ),
                         const SizedBox(height: 20),
-                        CustomTextField(
+                        TextFormField(
                           controller: _passwordController,
-                          labelText: 'Password',
-                          obscureText: true,
+                          obscureText: !_showPassword,
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            border: const OutlineInputBorder(),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _showPassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _showPassword = !_showPassword;
+                                });
+                              },
+                            ),
+                          ),
                           validator: Validators.passwordValidator,
                         ),
                         const SizedBox(height: 28),

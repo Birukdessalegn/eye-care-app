@@ -2,13 +2,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-
 import 'firebase_options.dart';
 import 'services/auth_service.dart';
 import 'screens/admin_dashboard.dart';
 import 'screens/awareness_screen.dart';
 import 'screens/chat_screen.dart';
 import 'screens/clinics_screen.dart';
+import 'screens/clinics_map_screen.dart';
 import 'screens/exercise_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/profile_screen.dart';
@@ -18,6 +18,7 @@ import 'screens/auth/otp_verification_screen.dart';
 import 'screens/auth/password_reset_screen.dart';
 import 'screens/auth/registration_screen.dart';
 import 'screens/questions_screen.dart';
+import 'screens/shop_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -91,6 +92,11 @@ class _MyAppState extends State<MyApp> {
           path: '/clinics',
           builder: (context, state) => const ClinicsScreen(),
         ),
+        GoRoute(
+          path: '/clinics-map',
+          builder: (context, state) => const ClinicsMapScreen(),
+        ),
+        GoRoute(path: '/shop', builder: (context, state) => ShopScreen()),
         GoRoute(
           path: '/profile',
           builder: (context, state) => const ProfileScreen(),
