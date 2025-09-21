@@ -101,8 +101,6 @@ class ReminderService with ChangeNotifier {
       platformChannelSpecifics,
       matchDateTimeComponents: DateTimeComponents.time,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
     );
 
     setState(() {

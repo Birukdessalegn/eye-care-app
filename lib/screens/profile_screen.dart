@@ -95,6 +95,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Profile'),
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: Icon(_isEditing ? Icons.save : Icons.edit),
@@ -123,119 +125,62 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 // User Info Card
                 Card(
-                  margin: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.symmetric(vertical: 16),
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(28.0),
                     child: Column(
                       children: [
                         CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.indigo[100],
+                          radius: 48,
+                          backgroundColor: Colors.indigo.shade100,
                           child: Text(
-                            user.firstName.isNotEmpty
-                                ? user.firstName[0].toUpperCase()
-                                : '?',
+                            (user.firstName ?? '').isNotEmpty
+                                ? user.firstName![0].toUpperCase()
+                                : '',
                             style: const TextStyle(
-                              fontSize: 36,
+                              fontSize: 40,
                               color: Colors.indigo,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 18),
                         Text(
-                          '${user.firstName} ${user.lastName}',
+                          '${user.firstName ?? ''} ${user.lastName ?? ''}',
                           style: const TextStyle(
-                            fontSize: 22,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
+                            color: Colors.indigo,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.email,
-                              size: 18,
-                              color: Colors.blueGrey,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              user.email,
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
+                        Text(
+                          user.email ?? '',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 16),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
-                              Icons.person,
-                              size: 18,
-                              color: Colors.blueGrey,
+                            Chip(
+                              label: Text(user.gender ?? 'Gender'),
+                              backgroundColor: Colors.indigo.shade50,
                             ),
-                            const SizedBox(width: 6),
-                            Text(
-                              user.gender ?? '-',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.cake,
-                              size: 18,
-                              color: Colors.blueGrey,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              user.dateOfBirth ?? '-',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.verified_user,
-                              size: 18,
-                              color: Colors.blueGrey,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              user.role ?? 'User',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.badge,
-                              size: 18,
-                              color: Colors.blueGrey,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'First Name: ${user.firstName}',
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.badge_outlined,
-                              size: 18,
-                              color: Colors.blueGrey,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Last Name: ${user.lastName}',
-                              style: const TextStyle(fontSize: 16),
+                            const SizedBox(width: 10),
+                            Chip(
+                              label: Text(
+                                user.dateOfBirth != null
+                                    ? user.dateOfBirth.toString()
+                                    : 'DOB',
+                              ),
+                              backgroundColor: Colors.indigo.shade50,
                             ),
                           ],
                         ),
@@ -246,43 +191,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 30),
                 // Editable Form (only if editing)
                 if (_isEditing)
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        CustomTextField(
-                          controller: _firstNameController,
-                          labelText: 'First Name',
-                          enabled: _isEditing,
+                  Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            CustomTextField(
+                              controller: _firstNameController,
+                              labelText: 'First Name',
+                              enabled: _isEditing,
+                            ),
+                            const SizedBox(height: 16),
+                            CustomTextField(
+                              controller: _lastNameController,
+                              labelText: 'Last Name',
+                              enabled: _isEditing,
+                            ),
+                            const SizedBox(height: 16),
+                            CustomTextField(
+                              controller: _genderController,
+                              labelText: 'Gender',
+                              enabled: _isEditing,
+                            ),
+                            const SizedBox(height: 16),
+                            CustomTextField(
+                              controller: _dobController,
+                              labelText: 'Date of Birth',
+                              enabled: _isEditing,
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 16),
-                        CustomTextField(
-                          controller: _lastNameController,
-                          labelText: 'Last Name',
-                          enabled: _isEditing,
-                        ),
-                        const SizedBox(height: 16),
-                        CustomTextField(
-                          controller: _genderController,
-                          labelText: 'Gender (e.g., Male, Female)',
-                          enabled: _isEditing,
-                        ),
-                        const SizedBox(height: 16),
-                        CustomTextField(
-                          controller: _dobController,
-                          labelText: 'Date of Birth (YYYY-MM-DD)',
-                          enabled: _isEditing,
-                        ),
-                        const SizedBox(height: 30),
-                        if (_isLoading)
-                          const Center(child: CircularProgressIndicator())
-                        else
-                          CustomButton(
-                            text: 'Save Changes',
-                            onPressed: _updateProfile,
-                          ),
-                      ],
+                      ),
                     ),
                   ),
               ],
@@ -290,19 +236,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         },
       ),
-      // Add this widget to all main screens (Home, Profile, etc.)
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0, // Set this index based on the current screen
+        currentIndex: 0,
         onTap: (index) {
           switch (index) {
             case 0:
-              context.go('/'); // Home
+              context.go('/');
               break;
             case 1:
-              context.go('/questions'); // Chat/Questions
+              context.go('/questions');
               break;
             case 2:
-              context.go('/profile'); // Profile/Settings
+              context.go('/profile');
               break;
           }
         },

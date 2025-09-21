@@ -95,6 +95,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     : CustomButton(
                         text: 'Verify & Register',
                         onPressed: _verifyOtp,
+                        color: Theme.of(context).primaryColor,
                       ),
                 const SizedBox(height: 20),
                 TextButton(

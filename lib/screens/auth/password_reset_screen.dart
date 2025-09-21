@@ -54,6 +54,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                 const SizedBox(height: 30.0),
                 CustomButton(
                   text: 'Send Reset Instructions',
+                  color: Colors.blue,
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       try {

@@ -51,65 +51,122 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Welcome Back')),
+      backgroundColor: const Color(0xFFF6F8F9),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                const Icon(Icons.remove_red_eye, size: 60, color: Colors.blue),
-                const SizedBox(height: 16),
-                const Text(
-                  'Eye Care',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Logo/Illustration
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(24),
+                child: const Icon(
+                  Icons.remove_red_eye,
+                  size: 56,
+                  color: Color(0xFF4CAF50),
+                ),
+              ),
+              const SizedBox(height: 24),
+              // Title
+              Text(
+                'Welcome Back!',
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF222B45),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Sign in to continue',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: Colors.grey[700],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              // Card with form
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 32,
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        CustomTextField(
+                          controller: _emailController,
+                          labelText: 'Email',
+                          keyboardType: TextInputType.emailAddress,
+                          validator: Validators.emailValidator,
+                        ),
+                        const SizedBox(height: 20),
+                        CustomTextField(
+                          controller: _passwordController,
+                          labelText: 'Password',
+                          obscureText: true,
+                          validator: Validators.passwordValidator,
+                        ),
+                        const SizedBox(height: 28),
+                        _isLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : CustomButton(
+                                text: 'Login',
+                                onPressed: _submit,
+                                color: const Color(0xFF4CAF50),
+                              ),
+                        const SizedBox(height: 16),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () => context.go('/reset-password'),
+                            child: const Text('Forgot Password?'),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Don't have an account? "),
+                            GestureDetector(
+                              onTap: () => context.go('/register'),
+                              child: Text(
+                                'Register',
+                                style: TextStyle(
+                                  color: const Color(0xFF4CAF50),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Sign in to continue',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 30),
-                CustomTextField(
-                  controller: _emailController,
-                  labelText: 'Email',
-                  keyboardType: TextInputType.emailAddress,
-                  validator: Validators.emailValidator,
-                ),
-                const SizedBox(height: 16.0),
-                CustomTextField(
-                  controller: _passwordController,
-                  labelText: 'Password',
-                  obscureText: true,
-                  validator: Validators.passwordValidator,
-                ),
-                const SizedBox(height: 30.0),
-                _isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : CustomButton(text: 'Login', onPressed: _submit),
-                const SizedBox(height: 16.0),
-                TextButton(
-                  onPressed: () {
-                    context.go('/reset-password');
-                  },
-                  child: const Text('Forgot Password?'),
-                ),
-                const SizedBox(height: 8.0),
-                TextButton(
-                  onPressed: () => context.go('/register'),
-                  child: const Text('Don\'t have an account? Register'),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
