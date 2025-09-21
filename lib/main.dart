@@ -130,6 +130,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp.router(
       routerConfig: _router,
       title: 'OcuCare',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.indigo,
         scaffoldBackgroundColor: Colors.grey[100],
