@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 import '../services/reminder_service.dart';
 
@@ -22,9 +23,12 @@ class _ReminderSettingsScreenState extends State<ReminderSettingsScreen> {
   }
 
   Future<void> _loadReminderSettings() async {
-    final reminderService = Provider.of<ReminderService>(context, listen: false);
+    final reminderService = Provider.of<ReminderService>(
+      context,
+      listen: false,
+    );
     await reminderService.loadReminderSettings();
-    
+
     setState(() {
       _isEnabled = reminderService.isEnabled;
       if (reminderService.reminderTime != null) {
@@ -50,8 +54,11 @@ class _ReminderSettingsScreenState extends State<ReminderSettingsScreen> {
       _isLoading = true;
     });
 
-    final reminderService = Provider.of<ReminderService>(context, listen: false);
-    
+    final reminderService = Provider.of<ReminderService>(
+      context,
+      listen: false,
+    );
+
     try {
       if (value) {
         await reminderService.scheduleDailyReminder(_selectedTime);
@@ -70,7 +77,7 @@ class _ReminderSettingsScreenState extends State<ReminderSettingsScreen> {
           ),
         );
       }
-      
+
       setState(() {
         _isEnabled = value;
         _isLoading = false;
@@ -80,10 +87,7 @@ class _ReminderSettingsScreenState extends State<ReminderSettingsScreen> {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
       );
     }
   }
@@ -109,14 +113,20 @@ class _ReminderSettingsScreenState extends State<ReminderSettingsScreen> {
                   ),
                   const SizedBox(height: 20),
                   SwitchListTile(
-                    title: const Text('Enable Reminders', style: TextStyle(fontWeight: FontWeight.bold)),
+                    title: const Text(
+                      'Enable Reminders',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     value: _isEnabled,
                     onChanged: _toggleReminder,
                     activeColor: Colors.blue,
                   ),
                   const SizedBox(height: 20),
                   ListTile(
-                    title: const Text('Reminder Time', style: TextStyle(fontWeight: FontWeight.bold)),
+                    title: const Text(
+                      'Reminder Time',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     subtitle: Text(
                       _selectedTime.format(context),
                       style: const TextStyle(fontSize: 18, color: Colors.blue),
@@ -130,7 +140,11 @@ class _ReminderSettingsScreenState extends State<ReminderSettingsScreen> {
                   const SizedBox(height: 30),
                   const Text(
                     'Tips for reducing eye strain:',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
                   ),
                   const SizedBox(height: 15),
                   _buildTipTile(
@@ -156,6 +170,32 @@ class _ReminderSettingsScreenState extends State<ReminderSettingsScreen> {
                 ],
               ),
             ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0, // Set this index based on the current screen
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              context.go('/'); // Home
+              break;
+            case 1:
+              context.go('/questions'); // Chat/Questions
+              break;
+            case 2:
+              context.go('/profile'); // Profile/Settings
+              break;
+          }
+        },
+        selectedItemColor: Colors.indigo,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble_outline),
+            label: 'Chat',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Profile'),
+        ],
+      ),
     );
   }
 

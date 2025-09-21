@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../utils/validators.dart';
+
+final ApiService apiService = ApiService();
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -30,36 +33,33 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       _isLoading = true;
     });
 
-    final authService = Provider.of<AuthService>(context, listen: false);
-    final email = _emailController.text.trim();
-
-    final success = await authService.requestRegistration(
-      firstName: _firstNameController.text.trim(),
-      lastName: _lastNameController.text.trim(),
-      email: email,
-      password: _passwordController.text.trim(),
-    );
-
-    if (mounted) {
+    try {
+      final result = await apiService.register(
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
       setState(() {
         _isLoading = false;
       });
-
-      if (success) {
-        // Navigate to OTP screen and pass the email via `extra`
-        context.go('/otp', extra: email);
+      if (result['success'] == true) {
+        print(
+          'Navigating to OTP screen with email: ${_emailController.text.trim()}',
+        );
+        context.go('/otp', extra: _emailController.text.trim());
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              authService.errorMessage.isNotEmpty
-                  ? authService.errorMessage
-                  : 'An unknown error occurred',
-            ),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(result['message'] ?? 'Registration failed.')),
         );
       }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 

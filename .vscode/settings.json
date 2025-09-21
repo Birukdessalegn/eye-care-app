@@ -1,3 +1,4 @@
 {
-  "IDX.agenticWorkspace": true
+  "IDX.agenticWorkspace": true,
+  "java.configuration.updateBuildConfiguration": "interactive"
 }

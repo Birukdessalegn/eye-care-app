@@ -5,12 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 
 class ApiService {
-  // --- IMPORTANT ---
-  // Replace this with your actual Laravel API URL when it is deployed.
-  final String _baseUrl = 'http://www.eyecare-api.infinityfree.me/api/doc';
-  // -----------------
+  final String _baseUrl = 'https://ocucare.onrender.com/api';
 
-  // --- Core API Methods ---
+  // --- Auth & Account ---
 
   Future<Map<String, dynamic>> register({
     required String firstName,
@@ -18,7 +15,7 @@ class ApiService {
     required String email,
     required String password,
   }) async {
-    return _post('/account/register', {
+    return _post('/accounts/register', {
       'first_name': firstName,
       'last_name': lastName,
       'email': email,
@@ -31,11 +28,10 @@ class ApiService {
     required String email,
     required String otp,
   }) async {
-    final response = await _post('/account/verify-email', {
+    final response = await _post('/accounts/verify-email', {
       'email': email,
       'otp': otp,
     });
-    // If verification is successful, save the returned JWT
     if (response['success'] == true && response['jwt'] != null) {
       await saveToken(response['jwt']);
     }
@@ -46,11 +42,10 @@ class ApiService {
     required String email,
     required String password,
   }) async {
-    final response = await _post('/account/login', {
+    final response = await _post('/accounts/login', {
       'email': email,
       'password': password,
     });
-    // If login is successful, save the returned JWT
     if (response['success'] == true && response['jwt'] != null) {
       await saveToken(response['jwt']);
     }
@@ -60,7 +55,8 @@ class ApiService {
   Future<Map<String, dynamic>> sendPasswordResetOtp({
     required String email,
   }) async {
-    return _post('/account/send-otp', {'email': email});
+    // This endpoint is /accounts/password-reset-token
+    return _post('/accounts/password-reset-token', {'email': email});
   }
 
   Future<Map<String, dynamic>> resetPassword({
@@ -68,20 +64,82 @@ class ApiService {
     required String token,
     required String password,
   }) async {
-    return _post('/account/reset-password', {
-      // Note: API spec says PATCH, but often form data comes via POST
+    // This endpoint is PATCH /accounts/reset-password
+    return _patch('/accounts/reset-password', {
       'email': email,
-      'token': token, // The token from the password reset email
+      'token': token,
       'password': password,
       'password_confirmation': password,
     });
   }
 
-  // Authenticated methods
+  Future<Map<String, dynamic>> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    // PATCH /accounts/change-password
+    return _patch('/accounts/change-password', {
+      'old_password': oldPassword,
+      'password': newPassword,
+      'password_confirmation': newPassword,
+    });
+  }
+
+  // --- Exercises ---
+
+  Future<Map<String, dynamic>> getExercises() async {
+    return _get('/exercises');
+  }
+
+  Future<Map<String, dynamic>> getExerciseProcedures(String exerciseId) async {
+    // GET /exercises/:eye_exercise_id/procedures
+    return _get('/exercises/$exerciseId/procedures');
+  }
+
+  Future<Map<String, dynamic>> searchExercises(String query) async {
+    return _post('/exercises', {'title': query});
+  }
+
+  // --- Orders ---
+
+  Future<Map<String, dynamic>> getOrders() async {
+    return _get('/orders');
+  }
+
+  Future<Map<String, dynamic>> createOrder(
+    Map<String, dynamic> orderData,
+  ) async {
+    return _post('/orders', orderData);
+  }
+
+  Future<Map<String, dynamic>> getOrderItems(String orderId) async {
+    return _get('/orders-items/$orderId');
+  }
+
+  // --- Products ---
+
+  Future<Map<String, dynamic>> getProducts() async {
+    return _get('/products');
+  }
+
+  Future<Map<String, dynamic>> createProduct(
+    Map<String, dynamic> productData,
+  ) async {
+    return _post('/products', productData);
+  }
+
+  Future<Map<String, dynamic>> rateProduct(String productId, int rate) async {
+    // PATCH /products/:product_id
+    return _patch('/products/$productId', {'rate': rate});
+  }
+
+  // --- User ---
+
   Future<UserModel> getUser() async {
-    final response = await _get('/user');
-    // The full user data is nested under the 'data' key
-    return UserModel.fromMap(response['data']);
+    final response = await _get(
+      '/users',
+    ); // <-- changed from '/user' to '/users'
+    return UserModel.fromMap(response['data']['user']); // adjust if needed
   }
 
   Future<Map<String, dynamic>> updateUser({
@@ -99,11 +157,43 @@ class ApiService {
   }
 
   Future<void> logout() async {
-    // Even if the backend doesn't have a logout endpoint,
-    // we always delete the local token.
     await deleteToken();
-    // You could optionally notify the backend, e.g.:
-    // try { await _post('/account/logout', {}); } catch (e) { /* ignore */ }
+  }
+
+  // --- Questions ---
+
+  Future<List<dynamic>> getQuestions() async {
+    final response = await _get('/questions');
+    if (response['success'] == true) {
+      return response['data'] as List<dynamic>;
+    } else {
+      throw Exception(response['message'] ?? 'Failed to load questions');
+    }
+  }
+
+  Future<Map<String, dynamic>> submitAnswer({
+    required String questionId,
+    required String answer,
+  }) async {
+    return _post('/questions', {'question_id': questionId, 'answer': answer});
+  }
+
+  // Get the next question or recommendation by answer id
+  Future<Map<String, dynamic>> getNextByAnswer(int answerId) async {
+    final response = await _get('/answers/$answerId');
+    return response;
+  }
+
+  Future<Map<String, dynamic>> getRootQuestion() async {
+    final response = await _get('/questions');
+    if (response['data'] is List && response['data'].isNotEmpty) {
+      // Return the first question in the list
+      return {...response, 'data': response['data'][0]};
+    } else if (response['data'] is Map) {
+      return response;
+    } else {
+      throw Exception('No root question found.');
+    }
   }
 
   // --- Generic HTTP Handlers ---
@@ -156,19 +246,15 @@ class ApiService {
   }
 
   Map<String, dynamic> _handleResponse(http.Response response) {
-    try {
-      final Map<String, dynamic> responseData = jsonDecode(response.body);
-      if (responseData['success'] == true) {
-        return responseData;
-      } else {
-        // Use the message from the API, or a default error
-        throw Exception(responseData['message'] ?? 'An API error occurred.');
-      }
-    } on FormatException {
-      throw Exception('Failed to parse server response. Please try again.');
-    } catch (e) {
-      // Re-throw API exceptions or other errors
-      throw Exception(e.toString().replaceFirst('Exception: ', ''));
+    print('Login response: ${response.body}'); // <-- Add this line
+    if (response.body.isEmpty) {
+      throw Exception('Empty response from server.');
+    }
+    final Map<String, dynamic> responseData = jsonDecode(response.body);
+    if (responseData['success'] == true) {
+      return responseData;
+    } else {
+      throw Exception(responseData['message'] ?? 'An API error occurred.');
     }
   }
 

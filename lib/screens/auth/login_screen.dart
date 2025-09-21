@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-
 import '../../services/auth_service.dart';
+import '../../services/api_service.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../utils/validators.dart';
+
+final ApiService apiService = ApiService();
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -29,31 +31,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final authService = Provider.of<AuthService>(context, listen: false);
     final success = await authService.login(
-      _emailController.text.trim(),
-      _passwordController.text.trim(),
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
     );
 
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
+    setState(() {
+      _isLoading = false;
+    });
 
-      if (success) {
-        // Navigate to OTP screen and pass the email
-        final email = _emailController.text.trim();
-        context.go('/otp', extra: email);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              authService.errorMessage.isNotEmpty
-                  ? authService.errorMessage
-                  : 'Login failed. Please check your credentials.',
-            ),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+    if (success) {
+      // The router will automatically redirect to home because isLoggedIn is true
+      // No need to call context.go('/')
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(authService.errorMessage)));
     }
   }
 

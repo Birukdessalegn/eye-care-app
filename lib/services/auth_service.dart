@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
 import 'api_service.dart';
@@ -8,8 +7,9 @@ class AuthService with ChangeNotifier {
 
   UserModel? _currentUser;
   String _errorMessage = '';
-  bool _isInitialized = false; // To prevent redirects before startup check is complete
-  
+  bool _isInitialized =
+      false; // To prevent redirects before startup check is complete
+
   // Public Getters
   UserModel? get currentUser => _currentUser;
   String get errorMessage => _errorMessage;
@@ -20,7 +20,6 @@ class AuthService with ChangeNotifier {
     _initialize();
   }
 
-  /// Checks for a saved token on app startup and fetches user data.
   Future<void> _initialize() async {
     final token = await _apiService.getToken();
     if (token != null) {
@@ -57,7 +56,7 @@ class AuthService with ChangeNotifier {
         notifyListeners();
         return true; // Indicates navigation to OTP screen is safe
       }
-       _errorMessage = response['message'] ?? 'Registration request failed.';
+      _errorMessage = response['message'] ?? 'Registration request failed.';
       notifyListeners();
       return false;
     } catch (e) {
@@ -90,17 +89,24 @@ class AuthService with ChangeNotifier {
   }
 
   /// Log in with email and password.
-  Future<bool> login(String email, String password) async {
+  Future<bool> login({required String email, required String password}) async {
     try {
-      final response = await _apiService.login(email: email, password: password);
-      if (response['success'] == true && response['jwt'] != null) {
-        // Login is successful, token is received. Now fetch user data.
-        await _fetchAndSetUser();
+      final result = await _apiService.login(email: email, password: password);
+      if (result['success'] == true) {
+        // Save JWT if present
+        if (result['jwt'] != null) {
+          await _apiService.saveToken(result['jwt']);
+        }
+        // Fetch and set the user!
+        await _fetchAndSetUser(); // <-- Add this line
+        _errorMessage = '';
+        // notifyListeners() is called in _fetchAndSetUser
         return true;
+      } else {
+        _errorMessage = result['message'] ?? 'Login failed.';
+        notifyListeners();
+        return false;
       }
-      _errorMessage = response['message'] ?? 'Login failed.';
-      notifyListeners();
-      return false;
     } catch (e) {
       _errorMessage = e.toString();
       notifyListeners();
@@ -124,7 +130,7 @@ class AuthService with ChangeNotifier {
       _errorMessage = 'Session expired. Please log in again.';
       _currentUser = null;
       // Rethrow to allow callers to handle it (like in _initialize)
-      rethrow; 
+      rethrow;
     } finally {
       notifyListeners();
     }

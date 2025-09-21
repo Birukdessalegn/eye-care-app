@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 class UserModel {
@@ -8,6 +7,7 @@ class UserModel {
   final String email;
   final String? gender;
   final String? dateOfBirth;
+  final String? role;
 
   UserModel({
     required this.id,
@@ -16,18 +16,19 @@ class UserModel {
     required this.email,
     this.gender,
     this.dateOfBirth,
+    this.role,
   });
 
-  String get fullName => '$firstName $lastName';
-
   factory UserModel.fromMap(Map<String, dynamic> map) {
+    final account = map['account'] ?? {};
     return UserModel(
       id: map['id']?.toString() ?? '',
       firstName: map['first_name'] ?? '',
       lastName: map['last_name'] ?? '',
-      email: map['email'] ?? '',
-      gender: map['gender'], // Corrected syntax
-      dateOfBirth: map['date_of_birth'], // Corrected syntax
+      email: account['email'] ?? '',
+      gender: map['gender'],
+      dateOfBirth: map['date_of_birth'],
+      role: account['role'],
     );
   }
 
@@ -39,10 +40,12 @@ class UserModel {
       'email': email,
       'gender': gender,
       'date_of_birth': dateOfBirth,
+      'role': role,
     };
   }
 
-  factory UserModel.fromJson(String source) => UserModel.fromMap(json.decode(source));
+  factory UserModel.fromJson(String source) =>
+      UserModel.fromMap(json.decode(source));
 
   String toJson() => json.encode(toMap());
 }

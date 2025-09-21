@@ -1,4 +1,3 @@
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -18,12 +17,11 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/otp_verification_screen.dart';
 import 'screens/auth/password_reset_screen.dart';
 import 'screens/auth/registration_screen.dart';
+import 'screens/questions_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     ChangeNotifierProvider(
       create: (context) => AuthService(),
@@ -50,10 +48,7 @@ class _MyAppState extends State<MyApp> {
       refreshListenable: authService,
       initialLocation: '/',
       routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) => const HomeScreen(),
-        ),
+        GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
         GoRoute(
           path: '/login',
           builder: (context, state) => const LoginScreen(),
@@ -67,13 +62,12 @@ class _MyAppState extends State<MyApp> {
           builder: (context, state) => const PasswordResetScreen(),
         ),
         GoRoute(
-  path: '/otp',
-  builder: (context, state) {
-    final email = state.extra as String; 
-    return OtpVerificationScreen(email: email);
-  },
-),
-
+          path: '/otp',
+          builder: (context, state) {
+            final email = state.extra as String;
+            return OtpVerificationScreen(email: email);
+          },
+        ),
         GoRoute(
           path: '/exercises',
           builder: (context, state) => const ExerciseScreen(),
@@ -87,13 +81,12 @@ class _MyAppState extends State<MyApp> {
           builder: (context, state) => const ReminderSettingsScreen(),
         ),
         GoRoute(
-  path: '/chat',
-  builder: (context, state) {
-    final userId = state.extra as String;
-    return ChatScreen(userId: userId);
-  },
-),
-
+          path: '/chat',
+          builder: (context, state) {
+            final userId = state.extra as String;
+            return ChatScreen(userId: userId);
+          },
+        ),
         GoRoute(
           path: '/clinics',
           builder: (context, state) => const ClinicsScreen(),
@@ -106,10 +99,18 @@ class _MyAppState extends State<MyApp> {
           path: '/admin',
           builder: (context, state) => const AdminDashboard(),
         ),
+        GoRoute(
+          path: '/questions',
+          builder: (context, state) => const QuestionsScreen(),
+        ),
       ],
       redirect: (context, state) {
         final isLoggedIn = authService.isLoggedIn;
-        final isLoggingIn = state.matchedLocation == '/login' || state.matchedLocation == '/register' || state.matchedLocation == '/reset-password' || state.matchedLocation == '/otp';
+        final isLoggingIn =
+            state.matchedLocation == '/login' ||
+            state.matchedLocation == '/register' ||
+            state.matchedLocation == '/reset-password' ||
+            state.matchedLocation == '/otp';
 
         if (!isLoggedIn && !isLoggingIn) {
           return '/login';
@@ -130,7 +131,30 @@ class _MyAppState extends State<MyApp> {
       routerConfig: _router,
       title: 'OcuCare',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.indigo,
+        scaffoldBackgroundColor: Colors.grey[100],
+        cardTheme: CardThemeData(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 4,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.indigo,
+          elevation: 1,
+          centerTitle: true,
+          titleTextStyle: TextStyle(
+            color: Colors.indigo,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
+        ),
       ),
     );
   }

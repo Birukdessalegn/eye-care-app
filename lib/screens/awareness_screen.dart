@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AwarenessScreen extends StatelessWidget {
   const AwarenessScreen({super.key});
@@ -6,9 +7,7 @@ class AwarenessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Eye Health Awareness'),
-      ),
+      appBar: AppBar(title: const Text('Eye Health Awareness')),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
@@ -37,6 +36,32 @@ class AwarenessScreen extends StatelessWidget {
           ),
         ],
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0, // Set this index based on the current screen
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              context.go('/'); // Home
+              break;
+            case 1:
+              context.go('/questions'); // Chat/Questions
+              break;
+            case 2:
+              context.go('/profile'); // Profile/Settings
+              break;
+          }
+        },
+        selectedItemColor: Colors.indigo,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble_outline),
+            label: 'Chat',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Profile'),
+        ],
+      ),
     );
   }
 
@@ -62,10 +87,7 @@ class AwarenessScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            Text(
-              content,
-              style: const TextStyle(fontSize: 16),
-            ),
+            Text(content, style: const TextStyle(fontSize: 16)),
           ],
         ),
       ),
